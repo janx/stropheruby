@@ -338,6 +338,19 @@ static VALUE t_xmpp_send(VALUE self, VALUE rb_stanza) {
     xmpp_send(conn,stanza);
     return Qtrue;
 }
+
+/* Send a stanza in the stream */
+static VALUE t_xmpp_send_raw_string(VALUE self, VALUE rb_text) {
+
+    xmpp_conn_t *conn;
+    char *text;
+    
+    Data_Get_Struct(self, xmpp_conn_t, conn);
+    text = STR2CSTR(rb_text);
+    
+    xmpp_send_raw_string(conn,text);
+    return Qtrue;
+}
     
 /* Create a new stanza */
 VALUE t_xmpp_stanza_new(VALUE class) {
@@ -647,6 +660,7 @@ void Init_strophe_ruby() {
     rb_define_method(cConnection, "connect", t_xmpp_connect_client,0);
     rb_define_method(cConnection, "disconnect", t_xmpp_disconnect, 0);
     rb_define_method(cConnection, "send", t_xmpp_send, 1);
+    rb_define_method(cConnection, "send_raw_string", t_xmpp_send_raw_string, 1);
 
     /*Handlers*/
     rb_define_method(cConnection, "add_handler", t_xmpp_handler_add, 1);
