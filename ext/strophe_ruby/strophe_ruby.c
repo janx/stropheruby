@@ -22,7 +22,7 @@ static void t_xmpp_stanza_release(void *stanza) {
 /* Initialize the strophe library */
 VALUE t_xmpp_initialize(VALUE self) {
     xmpp_initialize();
-    return Qnil;
+    return Qtrue;
 }
 
 /* shutdown the library */
