@@ -70,7 +70,7 @@ Examples = Split("""
 
 env = Environment()
 if env['CC'] == 'gcc':
-  env.Append(CCFLAGS=["-g", "-Wall"])
+  env.Append(CCFLAGS=["-g", "-Wall", "-fPIC"])
 
 expatenv = env.Copy()
 # feature defs
