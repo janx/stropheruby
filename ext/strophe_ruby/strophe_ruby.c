@@ -41,8 +41,8 @@ VALUE t_xmpp_version_check(VALUE self, VALUE major, VALUE minor) {
 VALUE t_xmpp_run_once(VALUE self, VALUE rb_ctx, VALUE timeout) {
     xmpp_ctx_t *ctx;        
     Data_Get_Struct(rb_ctx,xmpp_ctx_t,ctx);
-    xmpp_run_once(ctx, NUM2INT(timeout));
-    return Qtrue;        
+    int i = xmpp_run_once(ctx, NUM2INT(timeout));
+    return INT2FIX(i);        
 }
 
 /* parse the stream continuously (by calling xmpp_run_once in a while loop) */
@@ -314,7 +314,7 @@ static VALUE t_xmpp_connect_client(VALUE self) {
     if (rb_block_given_p())
 	client_conn_handler = rb_block_proc();
     
-    int result = xmpp_connect_client(conn, NULL, 0, _conn_handler, ctx);
+    int result = xmpp_connect_client(conn, NULL, _conn_handler, ctx);
     return INT2FIX(result);
 }
 
@@ -597,6 +597,9 @@ void Init_strophe_ruby() {
     rb_define_singleton_method(cEventLoop, "stop", t_xmpp_stop, 1);
     rb_define_singleton_method(cEventLoop, "shutdown", t_xmpp_shutdown, 0);
     rb_define_singleton_method(cEventLoop, "version", t_xmpp_version_check, 2);
+    rb_define_const(cEventLoop, "LOOP_RUNNING", INT2FIX(XMPP_LOOP_RUNNING));
+    rb_define_const(cEventLoop, "LOOP_NOTSTARTED", INT2FIX(XMPP_LOOP_NOTSTARTED));
+    rb_define_const(cEventLoop, "LOOP_QUIT", INT2FIX(XMPP_LOOP_QUIT));
     
     /*Logs*/
     mLogging = rb_define_module_under(mStropheRuby, "Logging");
