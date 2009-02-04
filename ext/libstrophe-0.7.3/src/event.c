@@ -33,7 +33,7 @@
 
 /* send data and check all connections for their events 
  * and call event handlers.  timeout is in milliseconds */
-void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
+int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 {
     xmpp_connlist_t *connitem;
     xmpp_conn_t *conn;
@@ -156,11 +156,11 @@ void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
     if (ret < 0) {
 	xmpp_error(ctx, "xmpp", "event watcher internal error %d", 
                    sock_error());
-	return;
+	return -1;
     }
     
     /* no events happened */
-    if (ret == 0) return;
+    if (ret == 0) return 1;
 
     /* process events */
     connitem = ctx->connlist;
@@ -220,6 +220,7 @@ void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 
     /* fire any ready handlers */
     handler_fire_timed(ctx);
+    return 0;
 }
 
 void xmpp_run(xmpp_ctx_t *ctx)

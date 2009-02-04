@@ -274,7 +274,7 @@ void xmpp_presence_new();
 
 
 /** event loop **/
-void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long  timeout);
+int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long  timeout);
 void xmpp_run(xmpp_ctx_t *ctx);
 void xmpp_stop(xmpp_ctx_t *ctx);
 
