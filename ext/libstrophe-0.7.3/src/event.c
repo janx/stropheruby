@@ -30,6 +30,7 @@
 #include "common.h"
 
 #define DEFAULT_TIMEOUT 1
+#define _DARWIN_UNLIMITED_SELECT
 
 /* send data and check all connections for their events 
  * and call event handlers.  timeout is in milliseconds */
