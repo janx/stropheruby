@@ -149,8 +149,8 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 
 	connitem = connitem->next;
     }
-
-    xmpp_debug(ctx, "xmpp", "select: %d %d", max, FD_SETSIZE);
+ 
+    xmpp_debug(ctx, "xmpp", "select: %d %d %d %d", max, FD_SETSIZE, tv.tv_sec, tv.tv_usec);
 
     /* check for events */
     ret = select(max + 1, &rfds,  &wfds, NULL, &tv);
