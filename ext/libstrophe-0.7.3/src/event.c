@@ -30,7 +30,6 @@
 #include "common.h"
 
 #define DEFAULT_TIMEOUT 1
-#define _DARWIN_UNLIMITED_SELECT
 
 /* send data and check all connections for their events 
  * and call event handlers.  timeout is in milliseconds */
@@ -46,8 +45,9 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
     size_t towrite;
     char buf[4096];
     uint64_t next;
+    long usec;
 
-    if (ctx->loop_status == XMPP_LOOP_QUIT) return;
+    if (ctx->loop_status == XMPP_LOOP_QUIT) return -2;
     ctx->loop_status = XMPP_LOOP_RUNNING;
 
     /* send queued data */
@@ -110,8 +110,9 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
        to be called */
     next = handler_fire_timed(ctx);
 
-    tv.tv_sec = 0;
-    tv.tv_usec = ((next < timeout) ? next : timeout) * 1000;
+    usec = ((next < timeout) ? next : timeout) * 1000;
+    tv.tv_sec = usec / 1000000;
+    tv.tv_usec = usec % 1000000;
 
     FD_ZERO(&rfds); 
     FD_ZERO(&wfds);
