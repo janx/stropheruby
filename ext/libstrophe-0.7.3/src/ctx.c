@@ -139,12 +139,12 @@ void xmpp_log(const xmpp_ctx_t * const ctx,
 	      va_list ap)
 {
     int oldret, ret;
-    char smbuf[1024];
+    char smbuf[4096] = {0};
     char *buf;
 
     buf = smbuf;
-    ret = xmpp_vsnprintf(buf, 1023, fmt, ap);
-    if (ret > 1023) {
+    ret = xmpp_vsnprintf(buf, 4096 - 1, fmt, ap);
+    if (ret > 4096 - 1) {
 	buf = (char *)xmpp_alloc(ctx, ret + 1);
 	if (!buf) {
 	    buf = NULL;

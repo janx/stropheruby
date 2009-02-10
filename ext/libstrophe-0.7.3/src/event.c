@@ -43,7 +43,7 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
     struct timeval tv;
     xmpp_send_queue_t *sq, *tsq;
     size_t towrite;
-    char buf[4096];
+    char buf[4096] = {0};
     uint64_t next;
     long usec;
 
