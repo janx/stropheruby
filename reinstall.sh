@@ -1,7 +1,7 @@
 cd ext/libstrophe-0.7.3
 scons
-cp -f *.a ../
-cd ../../strophe_ruby
+cp -f *.a ../strophe_ruby
+cd ../../
 rake clean
 rake compile
 rake gem
