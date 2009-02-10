@@ -15,8 +15,8 @@ VALUE cStanza;
 
 /* release the stanza. Called automatically by the GC */
 static void t_xmpp_stanza_release(void *stanza) {
-    if(stanza != NULL)
-      xmpp_stanza_release(stanza);    
+    //if(stanza != NULL)
+    //  xmpp_stanza_release(stanza);    
 }
 
 /* Initialize the strophe library */
