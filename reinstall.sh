@@ -5,4 +5,12 @@ cd ../../
 rake clean
 rake compile
 rake gem
-sudo gem install pkg/strophe_ruby-0.0.5.gem
+
+OS=`uname -s`
+
+if [ "${OS}" = "Linux" ] ; then
+  sudo gem install pkg/strophe_ruby-0.0.5.gem
+else
+  gem install pkg/strophe_ruby-0.0.5.gem
+fi
+
