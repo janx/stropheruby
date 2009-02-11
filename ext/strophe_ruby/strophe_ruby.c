@@ -185,18 +185,9 @@ static VALUE t_xmpp_conn_set_pass(VALUE self, VALUE pass) {
 static void _conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status, 
 		  const int error, xmpp_stream_error_t * const stream_error,
 		  void * const userdata) {
-    if (status == XMPP_CONN_CONNECT) {
-	xmpp_info(conn->ctx, "xmpp", "Connected");
-	  	    
-	
 	//yield code block for connection
 	if (RTEST(client_conn_handler))
 	    rb_funcall(client_conn_handler, rb_intern("call"), 1, INT2FIX(status));
-	    
-    } else {    	
-	xmpp_info(conn->ctx, "xmpp", "Disconnected");
-	xmpp_stop(conn->ctx);
-    }    
 }
 
 /*this is called in a loop (rb_iterate). We invoke the block passed by the user*/
