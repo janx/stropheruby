@@ -175,7 +175,7 @@ static char *_add_key(xmpp_ctx_t *ctx, hash_t *table, const char *key,
     olen = strlen(buf);
     value = hash_get(table, key);
     if (value == NULL) {
-	xmpp_error(ctx, "SASL", "couldn't retrieve value for '%s'", key);
+	xmpp_debug(ctx, "SASL", "couldn't retrieve value for '%s'", key);
 	value = "\"\"";
     }
     if (quote) {

@@ -465,7 +465,7 @@ static void _auth(xmpp_conn_t * const conn)
 	} else {
 	    xmpp_stanza_release(authdata);
 	    xmpp_stanza_release(iq);
-	    xmpp_error(conn->ctx, "auth", 
+	    xmpp_debug(conn->ctx, "auth", 
 		       "Cannot authenticate without resource");
 	    
 	    //presently fix: do not shutdown connection , allow 'register' to be sent 
