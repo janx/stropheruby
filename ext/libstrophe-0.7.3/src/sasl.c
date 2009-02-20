@@ -393,44 +393,43 @@ char *base64_encode(xmpp_ctx_t *ctx,
     clen = base64_encoded_len(ctx, len);
     cbuf = xmpp_alloc(ctx, clen + 1);
     if (cbuf != NULL) {
-	c = cbuf;
-	/* loop over data, turning every 3 bytes into 4 characters */
-	for (i = 0; i < len - 2; i += 3) {
-	    word = buffer[i] << 16 | buffer[i+1] << 8 | buffer[i+2];
-	    hextet = (word & 0x00FC0000) >> 18;
-	    *c++ = _base64_charmap[hextet];
-	    hextet = (word & 0x0003F000) >> 12;
-	    *c++ = _base64_charmap[hextet];
-	    hextet = (word & 0x00000FC0) >> 6;
-	    *c++ = _base64_charmap[hextet];
-	    hextet = (word & 0x000003F);
-	    *c++ = _base64_charmap[hextet];
-	}
-	/* zero, one or two bytes left */
-	switch (len - i) {
-	    case 0:
-		break;
-	    case 1:
-		hextet = (buffer[len-1] & 0xFC) >> 2;
-		*c++ = _base64_charmap[hextet];
-		hextet = (buffer[len-1] & 0x02) << 6;
-		*c++ = _base64_charmap[hextet];
-		*c++ = _base64_charmap[64]; /* pad */
-		*c++ = _base64_charmap[64]; /* pad */
-		break;
-	    case 2:
-		hextet = (buffer[len-2] & 0xFC) >> 2;
-		*c++ = _base64_charmap[hextet];
-		hextet = ((buffer[len-2] & 0x03) << 4) |
-			 ((buffer[len-1] & 0xF0) >> 4);
-		*c++ = _base64_charmap[hextet];
-		hextet = (buffer[len-1] & 0x0F) << 2;
-		*c++ = _base64_charmap[hextet];
-		*c++ = _base64_charmap[64]; /* pad */
-		break;
-	}
-	/* add a terminal null */
-	*c = '\0';
+    
+  int inlen = len;
+  int outlen = clen + 1;
+  const unsigned char* in = buffer;
+  char* out = cbuf;
+  static const char b64str[64] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  while (inlen && outlen)
+    {
+      *out++ = b64str[(in[0] >> 2) & 0x3f];
+      if (!--outlen)
+	break;
+      *out++ = b64str[((in[0] << 4)
+		       + (--inlen ? in[1] >> 4 : 0))
+		      & 0x3f];
+      if (!--outlen)
+	break;
+      *out++ =
+	(inlen
+	 ? b64str[((in[1] << 2)
+		   + (--inlen ? in[2] >> 6 : 0))
+		  & 0x3f]
+	 : '=');
+      if (!--outlen)
+	break;
+      *out++ = inlen ? b64str[in[2] & 0x3f] : '=';
+      if (!--outlen)
+	break;
+      if (inlen)
+	inlen--;
+      if (inlen)
+	in += 3;
+    }
+
+  if (outlen)
+    *out = '\0';
     }
 
     return cbuf;
