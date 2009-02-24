@@ -305,7 +305,7 @@ static VALUE t_xmpp_connect_client(VALUE self) {
     if (rb_block_given_p())
 	client_conn_handler = rb_block_proc();
     
-    int result = xmpp_connect_client(conn, NULL, _conn_handler, ctx);
+    int result = xmpp_connect_client(conn, NULL, 0, _conn_handler, ctx);
     return INT2FIX(result);
 }
 

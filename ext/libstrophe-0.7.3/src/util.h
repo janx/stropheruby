@@ -1,7 +1,7 @@
 /* util.h
-** libstrophe XMPP client library -- various utility functions
+** strophe XMPP client library -- various utility functions
 **
-** Copyright (C) 2005 OGG, LCC. All rights reserved.
+** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -10,6 +10,10 @@
 **  modified or distributed except as expressly authorized under the
 **  terms of the license contained in the file LICENSE.txt in this
 **  distribution.
+*/
+
+/** @file
+ *  Internally used utility functions.
 */
 
 #ifndef __LIBSTROPHE_UTIL_H__

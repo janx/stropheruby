@@ -1,7 +1,7 @@
 /* tls.h
-** libstrophe XMPP client library -- TLS abstraction header
+** strophe XMPP client library -- TLS abstraction header
 **
-** Copyright (C) 2005 OGG, LCC. All rights reserved.
+** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -12,10 +12,13 @@
 **  distribution.
 */
 
+/** @file
+ *  TLS abstraction API.
+ */
+
 #ifndef __LIBSTROPHE_TLS_H__
 #define __LIBSTROPHE_TLS_H__
 
-#include <gnutls/gnutls.h>
 #include "common.h"
 #include "sock.h"
 
@@ -36,5 +39,8 @@ int tls_error(tls_t *tls);
 
 int tls_read(tls_t *tls, void * const buff, const size_t len);
 int tls_write(tls_t *tls, const void * const buff, const size_t len);
+
+int tls_clear_pending_write(tls_t *tls);
+int tls_is_recoverable(int error);
 
 #endif /* __LIBSTROPHE_TLS_H__ */

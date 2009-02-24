@@ -30,7 +30,7 @@ int handle_reply(xmpp_conn_t * const conn,
     char *type;
 
     type = xmpp_stanza_get_type(stanza);
-    if (strcmp("type", "error") == 0)
+    if (strcmp(type, "error") == 0)
 	fprintf(stderr, "ERROR: query failed\n");
     else {
 	query = xmpp_stanza_get_child_by_name(stanza, "query");
@@ -93,8 +93,8 @@ int main(int argc, char **argv)
     xmpp_ctx_t *ctx;
     xmpp_conn_t *conn;
 
-    if (argc != 4) {
-	fprintf(stderr, "Usage: active <jid> <pass> <server>\n\n");
+    if (argc != 3) {
+	fprintf(stderr, "Usage: active <jid> <pass>\n\n");
 	return 1;
     }
 
@@ -112,7 +112,7 @@ int main(int argc, char **argv)
     xmpp_conn_set_pass(conn, argv[2]);
 
     /* initiate connection */
-    xmpp_connect_client(conn, argv[3], conn_handler, ctx);
+    xmpp_connect_client(conn, NULL, 0, conn_handler, ctx);
 
     /* start the event loop */
     xmpp_run(ctx);

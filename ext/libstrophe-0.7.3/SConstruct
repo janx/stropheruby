@@ -1,8 +1,9 @@
 # -*- Mode: python -*-
 # SCons build specification
 # see http://www.scons.org if you do not have this tool
-
-# Copyright (C) 2005 OGG, LCC. All rights reserved.
+#
+# Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
+#
 #  This software is provided AS-IS with no warranty, either express or
 #  implied.
 #
@@ -15,6 +16,9 @@
 # terms. See LICENSE.txt for details.
 
 # invoke with 'scons' to build the library
+
+# change this to one of openssl or schannel if you want TLS support
+TLS_PLUGIN = 'dummy'
 
 LIBSTROPHE_VERSION_MAJOR=0
 LIBSTROPHE_VERSION_MINOR=7
@@ -47,9 +51,9 @@ Sources = Split("""
   util.c
   thread.c
   snprintf.c
-  oocontext.cpp
-  oostanza.cpp
 """)
+
+Sources.append('tls_%s.c' % TLS_PLUGIN)
 
 Headers = Split("""
   strophe.h
@@ -71,8 +75,10 @@ Examples = Split("""
 env = Environment()
 if env['CC'] == 'gcc':
   env.Append(CCFLAGS=["-g", "-Wall", "-fPIC"])
+if env['CC'] == 'cl':
+  env.Append(CCFLAGS=["/MDd", "/ZI"])
 
-expatenv = env.Copy()
+expatenv = env.Clone()
 # feature defs
 expatenv.Append(CCFLAGS=" -DXML_DTD")
 expatenv.Append(CCFLAGS=" -DXML_NS")
@@ -85,19 +91,23 @@ expatenv.Append(CCFLAGS=" -DHAVE_UNISTD")
 expat = expatenv.Library('expat', path(join('expat', 'lib'), ExpatSources))
 Default(expat)
 
-stropheenv = env.Copy()
+stropheenv = env.Clone()
 stropheenv.Append(CCFLAGS=" -DXML_STATIC")
 stropheenv.Append(CPPPATH=['.', 'src', join('expat','lib')])
 
 strophe = stropheenv.Library('strophe', path("src", Sources))
 Default(strophe)
 
-exenv = env.Copy()
+exenv = env.Clone()
 exenv.Append(CPPPATH=['.'])
 exenv.Append(LIBS=["strophe", "expat"])
+if TLS_PLUGIN == 'openssl':
+  exenv.Append(LIBS=["ssl"])
 exenv.Append(LIBPATH=["."])
 if exenv["PLATFORM"] == "win32":
   exenv.Append(LIBS=["ws2_32", "winmm"])
+if exenv["PLATFORM"] != "win32":
+  exenv.Append(LIBS=["resolv"])
 for e in path("examples", Examples):
   example = exenv.Program(e)
   Default(example)
@@ -132,11 +142,15 @@ def testcase_runner(target, source, env):
   result = unittest.TextTestRunner(verbosity=2).run(suite)
   env.Execute(Touch(str(target[0])))
 
-testenv = env.Copy()
+testenv = env.Clone()
 testenv.Append(CPPPATH=['.', 'src', join('expat','lib')])
-testenv.Append(LIBS=['strophe', 'expat'])
+testenv.Append(LIBS=["strophe", "expat"])
+if TLS_PLUGIN == 'openssl':
+  testenv.Append(LIBS=["ssl"])
 if testenv["PLATFORM"] == "win32":
   testenv.Append(LIBS=["winmm", "ws2_32"])
+if testenv["PLATFORM"] != "win32":
+  testenv.Append(LIBS=["resolv"])
 testenv.Append(LIBPATH=['.'])
 
 import SCons.Node

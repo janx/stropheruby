@@ -1,7 +1,7 @@
-/* tls.c
-** libstrophe XMPP client library -- TLS abstraction dummy impl.
+/* tls_dummy.c
+** strophe XMPP client library -- TLS abstraction dummy impl.
 **
-** Copyright (C) 2005 OGG, LCC. All rights reserved.
+** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -10,6 +10,10 @@
 **  modified or distributed except as expressly authorized under the
 **  terms of the license contained in the file LICENSE.txt in this
 **  distribution.
+*/
+
+/** @file
+ *  TLS dummy implementation.
 */
 
 #include "common.h"
@@ -40,7 +44,7 @@ tls_t *tls_new(xmpp_ctx_t *ctx, sock_t sock)
 
 void tls_free(tls_t *tls)
 {
-    return
+    return;
 }
 
 int tls_set_credentials(tls_t *tls, const char *cafilename)
@@ -72,4 +76,14 @@ int tls_read(tls_t *tls, void * const buff, const size_t len)
 int tls_write(tls_t *tls, const void * const buff, const size_t len)
 {
     return -1;
+}
+
+int tls_clear_pending_write(tls_t *tls)
+{
+    return -1;
+}
+
+int tls_is_recoverable(int error)
+{
+    return 0;
 }

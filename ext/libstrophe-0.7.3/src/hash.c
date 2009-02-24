@@ -1,7 +1,7 @@
 /* hash.c
-** libstrophe XMPP client library -- hash table implementation
+** strophe XMPP client library -- hash table implementation
 ** 
-** Copyright (C) 2005 OGG, LCC. All rights reserved.
+** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -10,6 +10,10 @@
 **  modified or distributed except as expressly authorized under the
 **  terms of the license contained in the file LICENSE.txt in this
 **  distribution.
+*/
+
+/** @file
+ *  Hash tables.
 */
 
 #include <stdlib.h>
@@ -129,6 +133,9 @@ int hash_add(hash_t *table, const char * const key, void *data)
    hashentry_t *entry = NULL;
    int index = _hash_key(table, key);
 
+   /* drop existing entry, if any */
+   hash_drop(table, key);
+
    /* allocate and fill a new entry */
    entry = xmpp_alloc(ctx, sizeof(hashentry_t));
    if (!entry) return -1;
@@ -217,7 +224,7 @@ hash_iterator_t *hash_iter_new(hash_t *table)
 	iter->ref = 1;
 	iter->table = hash_clone(table);
 	iter->entry = NULL;
-	iter->index = 0;
+	iter->index = -1;
     }
 
     return iter;

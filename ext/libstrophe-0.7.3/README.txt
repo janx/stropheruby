@@ -1,14 +1,10 @@
-This is libstrophe, our experimental XMPP C client library.
+This is strophe, our XMPP client library.
 
 Our goals are:
 
-    (a) usable quickly
-    (b) well documented
-    (c) reliable
-    (d) not suck
-
-And to implement the complete XMPP spec, but not the historical Jabber 
-bits.
+    * usable quickly
+    * well documented
+    * reliable
 
 == Build Instructions ==
 
@@ -20,7 +16,7 @@ Once scons is installed, invoke 'scons' in the top-level
 directory to build the library. This will create a static
 library (also in the top-level) directory which can be
 linked into other programs. The public api is defined
-in <xmpp.h> which is also in the top-level directory.
+in <strophe.h> which is also in the top-level directory.
 
 Invoke 'scons test' in the top-level directory to execute
 the unit and self tests.
@@ -28,4 +24,14 @@ the unit and self tests.
 The examples/ directory contains some examples of how to
 use the library; these may be helpful in addition to the
 API documentation in doc/.
+
+
+== Requirements ==
+
+Libstrophe requires libresolv on UNIX systems. Make sure you include -lresolv
+if you are compiling by hand.
+
+It also uses expat for XML processing, but a current copy is included in the
+expat/ directory of the SVN checkout
+
 

@@ -1,7 +1,7 @@
 /* handler.c
-** libstrophe XMPP client library -- event handler management
+** strophe XMPP client library -- event handler management
 **
-** Copyright (C) 2005 OGG, LCC. All rights reserved.
+** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -11,6 +11,13 @@
 **  terms of the license contained in the file LICENSE.txt in this
 **  distribution.
 */
+
+/** @file
+ *  Event handler management.
+ */
+
+/** @defgroup Handlers Stanza and timed event handlers
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +32,13 @@
 #include "strophe.h"
 #include "common.h"
 
+/** Fire off all stanza handlers that match.
+ *  This function is called internally by the event loop whenever stanzas
+ *  are received from the XMPP server.
+ *
+ *  @param conn a Strophe connection object
+ *  @param stanza a Strophe stanza object
+ */
 void handler_fire_stanza(xmpp_conn_t * const conn,
 			 xmpp_stanza_t * const stanza)
 {
@@ -75,17 +89,20 @@ void handler_fire_stanza(xmpp_conn_t * const conn,
     while (item) {
 	/* skip newly added handlers */
 	if (!item->enabled) {
+        prev = item;
 	    item = item->next;
 	    continue;
 	}
 
 	/* don't call user handlers until authentication succeeds */
 	//if (item->user_handler && !conn->authenticated) {
+    //    prev = item;
 	//    item = item->next;
 	//    continue;
 	//}
 
-	if ((!item->ns || (ns && strcmp(ns, item->ns) == 0)) &&
+	if ((!item->ns || (ns && strcmp(ns, item->ns) == 0) ||
+	     xmpp_stanza_get_child_by_ns(stanza, item->ns)) &&
 	    (!item->name || (name && strcmp(name, item->name) == 0)) &&
 	    (!item->type || (type && strcmp(type, item->type) == 0)))
 	    if (!((xmpp_handler)(item->handler))(conn, stanza, item->userdata)) {
@@ -108,8 +125,13 @@ void handler_fire_stanza(xmpp_conn_t * const conn,
     }
 }
 
-/* helper function to fire timed handlers.  returns the 
- * time until the next handler would be fired */
+/** Fire off all timed handlers that are ready.
+ *  This function is called internally by the event loop.
+ *
+ *  @param ctx a Strophe context object
+ *
+ *  @return the time in milliseconds until the next handler will be ready
+ */
 uint64_t handler_fire_timed(xmpp_ctx_t * const ctx)
 {
     xmpp_connlist_t *connitem;
@@ -169,8 +191,12 @@ uint64_t handler_fire_timed(xmpp_ctx_t * const ctx)
     return min;
 }
 
-/* reset timed handlers for a connection.  this is called
- * whenever connection is successful */
+/** Reset all timed handlers.
+ *  This function is called internally when a connection is successful.
+ *
+ *  @param conn a Strophe connection object
+ *  @param user_only whether to reset all handlers or only user ones
+ */
 void handler_reset_timed(xmpp_conn_t *conn, int user_only)
 {
     xmpp_handlist_t *handitem;
@@ -223,6 +249,13 @@ static void _timed_handler_add(xmpp_conn_t * const conn,
     }
 }
 
+/** Delete a timed handler.
+ *
+ *  @param conn a Strophe connection object
+ *  @param handler function pointer to the handler
+ *
+ *  @ingroup Handlers
+ */
 void xmpp_timed_handler_delete(xmpp_conn_t * const conn,
 			       xmpp_timed_handler handler)
 {
@@ -292,6 +325,14 @@ static void _id_handler_add(xmpp_conn_t * const conn,
     }
 }
 
+/** Delete an id based stanza handler.
+ *
+ *  @param conn a Strophe connection object
+ *  @param handler a function pointer to a stanza handler
+ *  @param id a string containing the id the handler is for
+ *
+ *  @ingroup Handlers
+ */
 void xmpp_id_handler_delete(xmpp_conn_t * const conn,
 			    xmpp_handler handler,
 			    const char * const id)
@@ -322,6 +363,7 @@ void xmpp_id_handler_delete(xmpp_conn_t * const conn,
     }
 }
 
+/* add a stanza handler */
 static void _handler_add(xmpp_conn_t * const conn,
 			 xmpp_handler handler,
 			 const char * const ns,
@@ -386,6 +428,13 @@ static void _handler_add(xmpp_conn_t * const conn,
     }
 }
 
+/** Delete a stanza handler.
+ *
+ *  @param conn a Strophe connection object
+ *  @param handler a function pointer to a stanza handler
+ *
+ *  @ingroup Handlers
+ */
 void xmpp_handler_delete(xmpp_conn_t * const conn,
 			 xmpp_handler handler)
 {
@@ -416,6 +465,19 @@ void xmpp_handler_delete(xmpp_conn_t * const conn,
     }
 }
 
+/** Add a timed handler.
+ *  The handler will fire for the first time once the period has elapsed,
+ *  and continue firing regularly after that.  Strophe will try its best
+ *  to fire handlers as close to the period times as it can, but accuracy
+ *  will vary depending on the resolution of the event loop.
+ *   
+ *  @param conn a Strophe connection object
+ *  @param handler a function pointer to a timed handler
+ *  @param period the time in milliseconds between firings
+ *  @param userdata an opaque data pointer that will be passed to the handler
+ *
+ *  @ingroup Handlers
+ */
 void xmpp_timed_handler_add(xmpp_conn_t * const conn,
 			    xmpp_timed_handler handler,
 			    const unsigned long period,
@@ -424,6 +486,15 @@ void xmpp_timed_handler_add(xmpp_conn_t * const conn,
     _timed_handler_add(conn, handler, period, userdata, 1);
 }
 
+/** Add a timed system handler.
+ *  This function is used to add internal timed handlers and should not be
+ *  used outside of the library.
+ *
+ *  @param conn a Strophe connection object
+ *  @param handler a function pointer to a timed handler
+ *  @param period the time in milliseconds between firings
+ *  @param userdata an opaque data pointer that will be passed to the handler
+ */
 void handler_add_timed(xmpp_conn_t * const conn,
 		       xmpp_timed_handler handler,
 		       const unsigned long period,
@@ -432,6 +503,19 @@ void handler_add_timed(xmpp_conn_t * const conn,
     _timed_handler_add(conn, handler, period, userdata, 0);
 }
 
+/** Add an id based stanza handler.
+
+ *  This function adds a stanza handler for an &lt;iq/&gt; stanza of
+ *  type 'result' or 'error' with a specific id attribute.  This can
+ *  be used to handle responses to specific &lt;iq/&gt;s.
+ *
+ *  @param conn a Strophe connection object
+ *  @param handler a function pointer to a stanza handler
+ *  @param id a string with the id
+ *  @param userdata an opaque data pointer that will be passed to the handler
+ *
+ *  @ingroup Handlers
+ */
 void xmpp_id_handler_add(xmpp_conn_t * const conn,
 			 xmpp_handler handler,
 			 const char * const id,
@@ -440,6 +524,15 @@ void xmpp_id_handler_add(xmpp_conn_t * const conn,
     _id_handler_add(conn, handler, id, userdata, 1);
 }
 
+/** Add an id based system stanza handler.
+ *  This function is used to add internal id based stanza handlers and should
+ *  not be used outside of the library.
+ *
+ *  @param conn a Strophe connection object
+ *  @param handler a function pointer to a stanza handler
+ *  @param id a string with the id
+ *  @param userdata an opaque data pointer that will be passed to the handler
+ */
 void handler_add_id(xmpp_conn_t * const conn,
 		    xmpp_handler handler,
 		    const char * const id,
@@ -448,6 +541,25 @@ void handler_add_id(xmpp_conn_t * const conn,
     _id_handler_add(conn, handler, id, userdata, 0);
 }
 
+/** Add a stanza handler.
+ *  This function is used to add a stanza handler to a connection.
+ *  The handler will be called when the any of the filters match.  The
+ *  name filter matches to the top level stanza name.  The type filter
+ *  matches the 'type' attribute of the top level stanza.  The ns
+ *  filter matches the namespace ('xmlns' attribute) of either the top
+ *  level stanza or any of it's immediate children (this allows you do
+ *  handle specific &lt;iq/&gt; stanzas based on the &lt;query/&gt;
+ *  child namespace.
+ *
+ *  @param conn a Strophe connection object
+ *  @param handler a function pointer to a stanza handler
+ *  @param ns a string with the namespace to match
+ *  @param name a string with the stanza name to match
+ *  @param type a string with the 'type' attribute to match
+ *  @param userdata an opaque data pointer that will be passed to the handler
+ *
+ *  @ingroup Handlers
+ */
 void xmpp_handler_add(xmpp_conn_t * const conn,
 		      xmpp_handler handler,
 		      const char * const ns,
@@ -458,6 +570,17 @@ void xmpp_handler_add(xmpp_conn_t * const conn,
     _handler_add(conn, handler, ns, name, type, userdata, 1);
 }
 
+/** Add a system stanza handler.
+ *  This function is used to add internal stanza handlers and should
+ *  not be used outside of the library.
+ *
+ *  @param conn a Strophe connection object
+ *  @param handler a function pointer to a stanza handler
+ *  @param ns a string with the namespace to match
+ *  @param name a string with the stanza name to match
+ *  @param type a string with the 'type' attribute value to match
+ *  @param userdata an opaque data pointer that will be passed to the handler
+ */
 void handler_add(xmpp_conn_t * const conn,
 		 xmpp_handler handler,
 		 const char * const ns,

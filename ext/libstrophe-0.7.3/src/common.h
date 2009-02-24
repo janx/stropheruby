@@ -1,7 +1,7 @@
 /* common.h
-** libstrophe XMPP client library -- internal common structures
+** strophe XMPP client library -- internal common structures
 **
-** Copyright (C) 2005 OGG, LCC. All rights reserved.
+** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
 **
 **  This software is provided AS-IS with no warranty, either express or
 **  implied.
@@ -11,6 +11,10 @@
 **  terms of the license contained in the file LICENSE.txt in this
 **  distribution.
 */
+
+/** @file
+ *  Internally used functions and structures.
+ */
 
 #ifndef __LIBSTROPHE_COMMON_H__
 #define __LIBSTROPHE_COMMON_H__
@@ -24,6 +28,7 @@
 
 #include "strophe.h"
 #include "sock.h"
+#include "tls.h"
 #include "hash.h"
 #include "util.h"
 
@@ -53,7 +58,6 @@ struct _xmpp_ctx_t {
 
 /* convenience functions for accessing the context */
 void *xmpp_alloc(const xmpp_ctx_t * const ctx, const size_t size);
-void xmpp_free(const xmpp_ctx_t * const ctx, void *p);
 void *xmpp_realloc(const xmpp_ctx_t * const ctx, void *p, 
 		   const size_t size);
 char *xmpp_strdup(const xmpp_ctx_t * const ctx, const char * const s);
@@ -157,8 +161,10 @@ struct _xmpp_conn_t {
     int error;
     xmpp_stream_error_t *stream_error;
     sock_t sock;
+    tls_t *tls;
 
     int tls_support; 
+    int tls_failed; /* set when tls fails, so we don't try again */
     int sasl_support; /* if true, field is a bitfield of supported 
 			 mechanisms */ 
 
@@ -168,6 +174,8 @@ struct _xmpp_conn_t {
 
     char *lang;
     char *domain;
+    char *connectdomain;
+    char *connectport;
     char *jid;
     char *pass;
     char *stream_id;
@@ -209,11 +217,6 @@ struct _xmpp_conn_t {
 void conn_disconnect(xmpp_conn_t * const conn);
 void conn_disconnect_clean(xmpp_conn_t * const conn);
 void conn_open_stream(xmpp_conn_t * const conn);
-
-void xmpp_send_raw_string(xmpp_conn_t * const conn, 
-			  const char * const fmt, ...);
-void xmpp_send_raw(xmpp_conn_t * const conn, 
-		   const char * const data, const size_t len);
 
 
 typedef enum {
