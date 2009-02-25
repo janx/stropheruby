@@ -314,6 +314,7 @@ static VALUE t_xmpp_disconnect(VALUE self) {
     xmpp_conn_t *conn;
     Data_Get_Struct(self, xmpp_conn_t, conn);
     xmpp_disconnect(conn);
+    conn_disconnect(conn);
     return Qtrue;
 }
 
