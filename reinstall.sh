@@ -1,4 +1,4 @@
-cd ext/libstrophe-0.7.3
+cd ext/libstrophe
 scons
 cp -f *.a ../strophe_ruby
 cd ../../
