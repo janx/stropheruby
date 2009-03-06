@@ -340,7 +340,7 @@ static VALUE t_xmpp_send_raw_string(VALUE self, VALUE rb_text) {
     Data_Get_Struct(self, xmpp_conn_t, conn);
     text = STR2CSTR(rb_text);
     
-    xmpp_send_raw_string(conn,text);
+    xmpp_send_raw_string(conn, "%s", text);
     return Qtrue;
 }
     
