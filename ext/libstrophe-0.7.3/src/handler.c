@@ -53,10 +53,10 @@ void handler_fire_stanza(xmpp_conn_t * const conn,
 	while (item) {
 	    xmpp_handlist_t *next = item->next;
 
-	    //if (item->user_handler && !conn->authenticated) {
-		//item = next;
- 		//continue;
-	    //}
+	    if (item->user_handler && !conn->authenticated) {
+		item = next;
+ 		continue;
+	    }
 
 	    if (!((xmpp_handler)(item->handler))(conn, stanza, item->userdata)) {
 		/* handler is one-shot, so delete it */
@@ -95,11 +95,11 @@ void handler_fire_stanza(xmpp_conn_t * const conn,
 	}
 
 	/* don't call user handlers until authentication succeeds */
-	//if (item->user_handler && !conn->authenticated) {
-    //    prev = item;
-	//    item = item->next;
-	//    continue;
-	//}
+	if (item->user_handler && !conn->authenticated) {
+	    prev = item;
+	    item = item->next;
+	    continue;
+	}
 
 	if ((!item->ns || (ns && strcmp(ns, item->ns) == 0) ||
 	     xmpp_stanza_get_child_by_ns(stanza, item->ns)) &&
@@ -162,10 +162,10 @@ uint64_t handler_fire_timed(xmpp_ctx_t * const ctx)
 	    }
 
 	    /* only fire user handlers after authentication */
-	    //if (handitem->user_handler && !connitem->conn->authenticated) {
-		//handitem = handitem->next;
-		//continue;
-	    //}
+	    if (handitem->user_handler && !connitem->conn->authenticated) {
+		handitem = handitem->next;
+		continue;
+	    }
 
 	    fired = 0;
 	    elapsed = time_elapsed(handitem->last_stamp, time_stamp());

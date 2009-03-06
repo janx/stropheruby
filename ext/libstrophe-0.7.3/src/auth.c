@@ -231,7 +231,15 @@ static int _handle_features(xmpp_conn_t * const conn,
 	}
     }
 
-    _auth(conn);
+    if (conn->pass == NULL || conn->pass[0] == '\0') {
+        xmpp_debug(conn->ctx, "auth", "do not attempt auth as there is no password given");
+        //If no password, do not login, this will give 'register' a chance to run 
+      	conn->authenticated = 1;
+	      /* call connection handler */
+	      conn->conn_handler(conn, XMPP_CONN_CONNECT, 0, NULL, conn->userdata);
+    } else {
+        _auth(conn);
+    }
 
     return 0;
 }
@@ -651,12 +659,7 @@ static void _auth(xmpp_conn_t * const conn)
 	    xmpp_stanza_release(iq);
 	    xmpp_error(conn->ctx, "auth", 
 		       "Cannot authenticate without resource");
-	    
-	    //presently fix: do not shutdown connection , allow 'register' to be sent 
-	    conn->conn_handler(conn, XMPP_CONN_DISCONNECT, conn->error,
-		       conn->stream_error, conn->userdata);
-	    //xmpp_disconnect(conn);
-	    
+	    xmpp_disconnect(conn);
 	    return;
 	}
 	xmpp_stanza_add_child(child, authdata);
