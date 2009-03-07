@@ -1,6 +1,6 @@
 #include <ruby.h>
 #include "strophe.h"
-#include "strophe/common.h"
+#include "common.h"
 
 VALUE mStropheRuby;
 VALUE mErrorTypes;

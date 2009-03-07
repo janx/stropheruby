@@ -1,25 +1,21 @@
-%w[rubygems rake rake/clean fileutils newgem rubigen].each { |f| require f }
-#require File.dirname(__FILE__) + '/lib/strophe_ruby'
-
+require 'rubygems'
 require 'hoe'
 
-# Generate all the Rake tasks
-# Run 'rake -T' to see list of generated tasks (from gem root directory)
-$hoe = Hoe.new('strophe_ruby', '0.0.5') do |p|
-  p.developer('François Lamontagne', 'flamontagne@gmail.com')
-  p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
-  p.rubyforge_name       = p.name # TODO this is default value
- # p.extra_dev_deps = [
- #   ['newgem', ">= #{::Newgem::VERSION}"]
- # ]
+EXT = "ext/strophe_ruby.#{Hoe::DLEXT}"
+
+Hoe.new('strophe_ruby', '0.0.5') do |p|
+  p.developer('François Lamontagne', 'flamontagne@gmail.com') 
   p.summary = 'strophe_ruby' 
-  p.clean_globs |= %w[**/.DS_Store tmp *.log]
-  path = (p.rubyforge_name == p.name) ? p.rubyforge_name : "\#{p.rubyforge_name}/\#{p.name}"
-  p.remote_rdoc_dir = File.join(path.gsub(/^#{p.rubyforge_name}\/?/,''), 'rdoc')
-  p.rsync_args = '-av --delete --ignore-errors'
+
+  p.spec_extras[:extensions] = "ext/extconf.rb"
+  p.clean_globs << EXT << "ext/*.o" << "ext/Makefile"
 end
 
-require 'newgem/tasks' # load /tasks/*.rake
-Dir['tasks/**/*.rake'].each { |t| load t }
+task :test => EXT
 
-task :default => :compile
+file EXT => ["ext/extconf.rb", "ext/strophe_ruby.c"] do
+  Dir.chdir "ext" do
+    ruby "extconf.rb"
+    sh "make"
+  end
+end
