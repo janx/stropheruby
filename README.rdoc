@@ -48,6 +48,7 @@ gem install yong-stropheruby
     end
   end
 
+  #run event loop until timeout or 'StropheRuby::EventLoop.stop' is called
   ctx.loop_status = StropheRuby::EventLoop::LOOP_RUNNING
   while ctx.loop_status == StropheRuby::EventLoop::LOOP_RUNNING
     #return if the socket is idle for more than 3 seconds
