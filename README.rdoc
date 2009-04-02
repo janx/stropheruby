@@ -18,42 +18,42 @@ gem install yong-stropheruby
 
 == EXAMPLE
 
-require 'strophe_ruby'
+  require 'strophe_ruby'
 
-lib = StropheRuby::EventLoop.prepare
-ctx = StropheRuby::Context.new(StropheRuby::Logging::DEBUG)
-connection = StropheRuby::Connection.new(ctx)
-connection.jid = "a1@localhost"
-connection.password = "a1"
-connected = false
-connection.connect do |status|
-  if !connected
-    connected = true
-    if status != StropheRuby::ConnectionEvents::CONNECT
-      #do somthing after login fails
-      raise 'failed to login'
-    else
-      #do something after login
-      current_stage = 1
-      connection.add_handler("iq") do |iq|
-        case current_stage
-        when 1 
-          connection.send_raw_string("<iq type='get' id='1238647002'><query xmlns='jabber:iq:roster'/></iq>")
-          current_stage += 1
-        else
-          StropheRuby::EventLoop.stop(ctx)
+  lib = StropheRuby::EventLoop.prepare
+  ctx = StropheRuby::Context.new(StropheRuby::Logging::DEBUG)
+  connection = StropheRuby::Connection.new(ctx)
+  connection.jid = "a1@localhost"
+  connection.password = "a1"
+  connected = false
+  connection.connect do |status|
+    if !connected
+      connected = true
+      if status != StropheRuby::ConnectionEvents::CONNECT
+        #do somthing after login fails
+        raise 'failed to login'
+      else
+        #do something after login
+        current_stage = 1
+        connection.add_handler("iq") do |iq|
+          case current_stage
+          when 1 
+            connection.send_raw_string("<iq type='get' id='1238647002'><query xmlns='jabber:iq:roster'/></iq>")
+            current_stage += 1
+          else
+            StropheRuby::EventLoop.stop(ctx)
+          end
         end
       end
     end
   end
-end
 
-ctx.loop_status = StropheRuby::EventLoop::LOOP_RUNNING
-while ctx.loop_status == StropheRuby::EventLoop::LOOP_RUNNING
-  #return if the socket is idle for more than 3 seconds
-  if StropheRuby::EventLoop.run_once(ctx, 3000) != 0
-    break
+  ctx.loop_status = StropheRuby::EventLoop::LOOP_RUNNING
+  while ctx.loop_status == StropheRuby::EventLoop::LOOP_RUNNING
+    #return if the socket is idle for more than 3 seconds
+    if StropheRuby::EventLoop.run_once(ctx, 3000) != 0
+      break
+    end
   end
-end
 
-connection.disconnect
+  connection.disconnect
