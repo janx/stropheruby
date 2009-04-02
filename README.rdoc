@@ -1,0 +1,59 @@
+== OVERVIEW
+
+Stropheruby is a ruby bindings for Strophe, a C library for writing XMPP clients.
+
+This is a fork of flamontagne's stropheruby (http://github.com/flamontagne/stropheruby/tree/master) with the following improvements:
+
+* A patched version of libstrophe (trunk) is included. So there is no extra library to install. 
+* (libstrophe) Fixed a timeout issue on Mac OSX: http://groups.google.com/group/strophe-dev/browse_thread/thread/ef4cb19785020fb6
+* (libstrophe) Fixed basic auth: http://groups.google.com/group/strophe-dev/browse_thread/thread/b770f72c83d1a0b9
+* (libstrophe) Changed xmpp_run_once's return code so that the application can tell if an error or timeout occurs
+* (stropheruby) Added send_raw_string method
+* (stropheruby) Detect login failure
+* (stropheruby) Fix resource leak
+
+== INSTALLATION
+
+gem install yong-stropheruby
+
+== EXAMPLE
+
+require 'strophe_ruby'
+
+lib = StropheRuby::EventLoop.prepare
+ctx = StropheRuby::Context.new(StropheRuby::Logging::DEBUG)
+connection = StropheRuby::Connection.new(ctx)
+connection.jid = "a1@localhost"
+connection.password = "a1"
+connected = false
+connection.connect do |status|
+  if !connected
+    connected = true
+    if status != StropheRuby::ConnectionEvents::CONNECT
+      #do somthing after login fails
+      raise 'failed to login'
+    else
+      #do something after login
+      current_stage = 1
+      connection.add_handler("iq") do |iq|
+        case current_stage
+        when 1 
+          connection.send_raw_string("<iq type='get' id='1238647002'><query xmlns='jabber:iq:roster'/></iq>")
+          current_stage += 1
+        else
+          StropheRuby::EventLoop.stop(ctx)
+        end
+      end
+    end
+  end
+end
+
+ctx.loop_status = StropheRuby::EventLoop::LOOP_RUNNING
+while ctx.loop_status == StropheRuby::EventLoop::LOOP_RUNNING
+  #return if the socket is idle for more than 3 seconds
+  if StropheRuby::EventLoop.run_once(ctx, 3000) != 0
+    break
+  end
+end
+
+connection.disconnect
