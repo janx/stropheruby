@@ -3,7 +3,7 @@ require 'hoe'
 
 EXT = "ext/strophe_ruby.#{Hoe::DLEXT}"
 
-Hoe.new('stropheruby', '0.0.6') do |p|
+Hoe.new('stropheruby', '0.1.0') do |p|
   p.developer('François Lamontagne', 'flamontagne@gmail.com') 
   p.summary = 'strophe_ruby' 
 

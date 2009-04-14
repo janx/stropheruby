@@ -4,6 +4,7 @@ Manifest.txt
 PostInstall.txt
 README.rdoc
 Rakefile
+examples/xmpp_client.rb
 ext/md5.c
 ext/parser.c
 ext/util.c
