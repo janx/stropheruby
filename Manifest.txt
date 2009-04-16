@@ -2,7 +2,7 @@
 History.txt
 Manifest.txt
 PostInstall.txt
-README.rdoc
+README.txt
 Rakefile
 examples/xmpp_client.rb
 ext/md5.c

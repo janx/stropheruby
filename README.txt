@@ -8,14 +8,19 @@ This is a fork of flamontagne's stropheruby (http://github.com/flamontagne/strop
 * (libstrophe) Fixed a timeout issue on Mac OSX: http://groups.google.com/group/strophe-dev/browse_thread/thread/ef4cb19785020fb6
 * (libstrophe) Fixed basic auth: http://groups.google.com/group/strophe-dev/browse_thread/thread/b770f72c83d1a0b9
 * (libstrophe) Changed xmpp_run_once's return code so that the application can tell if an error or timeout occurs
+* (libstrophe) Better error reporting for login failure
 * (stropheruby) Added send_raw_string method
 * (stropheruby) Detect login failure
 * (stropheruby) Fix resource leak
+* (stropheruby) Added wrapper class for xmpp_stream_error_t (StropheRuby::StreamError)
 
 == INSTALLATION
 
 sudo gem sources -a http://gems.github.com
 sudo gem install yong-stropheruby
+
+For Rails app, add this line in your config/environment.rb:
+config.gem "yong-stropheruby", :source => "http://gems.github.com", :lib => "strophe_ruby"
 
 == EXAMPLE
 

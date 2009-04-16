@@ -18,22 +18,21 @@ class XmppClient
   
 private
 
-  def new_connection(jid, password)
+  def new_connection(jid, password, login_can_not_fail = true)
     lib = StropheRuby::EventLoop.prepare
     @ctx = StropheRuby::Context.new(StropheRuby::Logging::DEBUG)
     @connection = StropheRuby::Connection.new(@ctx)
     @connection.jid = jid
     @connection.password = password
-    connected = false
-    @connection.connect do |status|
-      if !connected
-        connected = true
-        if status != StropheRuby::ConnectionEvents::CONNECT
+    logged_in = false
+    @connection.connect do |status, error, stream_error|
+      if !logged_in
+        if login_can_not_fail && status != StropheRuby::ConnectionEvents::CONNECT
           #do somthing after login fails
-          raise 'failed to login'
+          raise "failed to login: #{error} #{stream_error}"
         else
-          #do something after login
           yield if block_given?
+          logged_in = true
         end
       end
     end

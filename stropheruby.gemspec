@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.email = ["flamontagne@gmail.com"]
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "PostInstall.txt"]
-  s.files = [".autotest", "History.txt", "Manifest.txt", "PostInstall.txt", "README.rdoc", "Rakefile", "ext/md5.c", "ext/parser.c", "ext/util.c", "ext/strophe_ruby.c", "ext/conn.c", "ext/ctx.c", "ext/jid.c", "ext/handler.c", "ext/hash.c", "ext/sasl.c", "ext/event.c", "ext/auth.c", "ext/thread.c", "ext/stanza.c", "ext/tls_dummy.c", "ext/sha1.c", "ext/snprintf.c", "ext/sock.c", "ext/tls.h", "ext/sasl.h", "ext/thread.h", "ext/util.h", "ext/common.h", "ext/md5.h", "ext/hash.h", "ext/sha1.h", "ext/sock.h", "ext/strophe.h", "ext/ostypes.h", "lib/strophe_ruby.rb", "test/test_helper.rb", "test/test_strophe_ruby.rb", "test/test_strophe_ruby_extn.rb", "ext/extconf.rb", "examples/xmpp_client.rb"]
+  s.files = [".autotest", "History.txt", "Manifest.txt", "PostInstall.txt", "README.txt", "Rakefile", "ext/md5.c", "ext/parser.c", "ext/util.c", "ext/strophe_ruby.c", "ext/conn.c", "ext/ctx.c", "ext/jid.c", "ext/handler.c", "ext/hash.c", "ext/sasl.c", "ext/event.c", "ext/auth.c", "ext/thread.c", "ext/stanza.c", "ext/tls_dummy.c", "ext/sha1.c", "ext/snprintf.c", "ext/sock.c", "ext/tls.h", "ext/sasl.h", "ext/thread.h", "ext/util.h", "ext/common.h", "ext/md5.h", "ext/hash.h", "ext/sha1.h", "ext/sock.h", "ext/strophe.h", "ext/ostypes.h", "lib/strophe_ruby.rb", "test/test_helper.rb", "test/test_strophe_ruby.rb", "test/test_strophe_ruby_extn.rb", "ext/extconf.rb", "examples/xmpp_client.rb"]
   s.has_rdoc = true
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib", "ext"]

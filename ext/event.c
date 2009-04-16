@@ -244,7 +244,8 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 		/* connection complete */
 
 		/* check for error */
-		if (sock_connect_error(conn->sock) != 0) {
+		conn->error =  sock_connect_error(conn->sock); 
+		if (conn->error != 0) {
 		    /* connection failed */
 		    xmpp_debug(ctx, "xmpp", "connection failed");
 		    conn_disconnect(conn);

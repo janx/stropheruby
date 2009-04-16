@@ -12,6 +12,7 @@ VALUE cStreamError;
 VALUE cEventLoop;
 VALUE client_conn_handler;
 VALUE cStanza;
+VALUE cStreamError;
 
 /* release the stanza. Called automatically by the GC */
 static void t_xmpp_stanza_release(void *stanza) {
@@ -186,8 +187,34 @@ static void _conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t stat
 		  const int error, xmpp_stream_error_t * const stream_error,
 		  void * const userdata) {
 	//yield code block for connection
-	if (RTEST(client_conn_handler))
-	    rb_funcall(client_conn_handler, rb_intern("call"), 1, INT2FIX(status));
+	if (RTEST(client_conn_handler)) {
+	    VALUE args[3];
+	    args[0] = INT2FIX(status);
+	    args[1] = INT2FIX(error);
+	    args[2] = (NULL == stream_error) ? Qnil : Data_Wrap_Struct(cStreamError, 0, NULL, stream_error);
+	    rb_funcall2(client_conn_handler, rb_intern("call"), 3, args);
+	}
+}
+
+/*Get the type of a StreamError. */
+static VALUE t_xmpp_stream_error_get_type(VALUE self) {
+    xmpp_stream_error_t *stream_error;    
+    Data_Get_Struct(self, xmpp_stream_error_t, stream_error);
+    return INT2FIX(stream_error->type);
+}
+
+/*Get the text of a StreamError. */
+static VALUE t_xmpp_stream_error_get_text(VALUE self) {
+    xmpp_stream_error_t *stream_error;    
+    Data_Get_Struct(self, xmpp_stream_error_t, stream_error);  
+    return (NULL != stream_error->text) ? rb_str_new2(stream_error->text) : Qnil;
+}
+
+/*Get the stanza of a StreamError. */
+static VALUE t_xmpp_stream_error_get_stanza(VALUE self) {
+    xmpp_stream_error_t *stream_error;    
+    Data_Get_Struct(self, xmpp_stream_error_t, stream_error);  
+    return (NULL != stream_error->stanza) ? Data_Wrap_Struct(cStanza, 0, NULL, stream_error->stanza) : Qnil;
 }
 
 /*this is called in a loop (rb_iterate). We invoke the block passed by the user*/
@@ -506,6 +533,7 @@ static VALUE t_xmpp_stanza_set_ns(VALUE self, VALUE rb_ns) {
     return Qtrue;
 }
 
+/*Convert Stanza to String */
 static VALUE t_xmpp_stanza_to_text(VALUE self) {
     xmpp_stanza_t *stanza;    
     Data_Get_Struct(self, xmpp_stanza_t, stanza);
@@ -660,6 +688,12 @@ void Init_strophe_ruby() {
     /*Handlers*/
     rb_define_method(cConnection, "add_handler", t_xmpp_handler_add, 1);
     rb_define_method(cConnection, "add_id_handler", t_xmpp_id_handler_add, 3);
+
+    /*StreamError*/
+    cStreamError = rb_define_class_under(mStropheRuby, "StreamError", rb_cObject);
+    rb_define_method(cStreamError, "error_type", t_xmpp_stream_error_get_type, 0);
+    rb_define_method(cStreamError, "text", t_xmpp_stream_error_get_text, 0);
+    rb_define_method(cStreamError, "stanza", t_xmpp_stream_error_get_stanza, 0);
 
     /*Stanza*/
     cStanza = rb_define_class_under(mStropheRuby, "Stanza", rb_cObject);
