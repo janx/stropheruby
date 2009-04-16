@@ -231,7 +231,10 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
     }
     
     /* no events happened */
-    if (ret == 0) return 1;
+    if (ret == 0) {
+	conn->error = ETIMEDOUT;
+	return 1;
+    }
 
     /* process events */
     connitem = ctx->connlist;
