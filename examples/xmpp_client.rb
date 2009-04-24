@@ -7,12 +7,24 @@ class XmppClient
       @connection.add_handler("iq") do |iq|
         case current_stage
         when 1 
-          @connection.send_raw_string("<iq type='get' id='1238647002'><query xmlns='jabber:iq:roster'/></iq>")
+          @connection.send_raw_string("<iq type='get' id='#{Time.now.to_i.to_s}'><query xmlns='jabber:iq:roster'/></iq>")
           current_stage += 1
         else
           StropheRuby::EventLoop.stop(@ctx)
         end
       end
+    }
+  end
+
+  def create_user(jid, password)
+    new_connection(jid, "", false) {
+      #create_user is special, it does not wait for an iq reply to send the resgister message
+      @connection.add_handler("iq") do |iq|
+        StropheRuby::EventLoop.stop(@ctx)
+      end
+      username = jid.split('@')[0]
+      hostname = jid.split('@')[1]
+      @connection.send_raw_string("<iq type='set' id='#{Time.now.to_i.to_s}' to='#{hostname}' xmlns='jabber:client'><query xmlns='jabber:iq:register'><username>#{username}</username><password>#{password}</password></query></iq>")
     }
   end
   
@@ -60,5 +72,6 @@ end
 
 if $0 == __FILE__
   client = XmppClient.new
-  client.query_roster("a1@localhost", 'a1')
+  client.create_user("b1@localhost", 'b1')
+  #client.query_roster("a1@localhost", 'a1')
 end
