@@ -24,4 +24,4 @@ config.gem "yong-stropheruby", :source => "http://gems.github.com", :lib => "str
 
 == EXAMPLE
 
-See example.rb
+See examples/xmpp_client.rb
