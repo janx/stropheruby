@@ -9,9 +9,10 @@ This is a fork of flamontagne's stropheruby (http://github.com/flamontagne/strop
 * (libstrophe) Fixed basic auth: http://groups.google.com/group/strophe-dev/browse_thread/thread/b770f72c83d1a0b9
 * (libstrophe) Changed xmpp_run_once's return code so that the application can tell if an error or timeout occurs
 * (libstrophe) Better error reporting for login failure
+* (libstrophe) If no password given, do not login. This will give 'register' a chance to run 
 * (stropheruby) Added send_raw_string method
 * (stropheruby) Detect login failure
-* (stropheruby) Fix resource leak
+* (stropheruby) Fixed a resource leak
 * (stropheruby) Added wrapper class for xmpp_stream_error_t (StropheRuby::StreamError)
 
 == INSTALLATION
