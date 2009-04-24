@@ -72,6 +72,6 @@ end
 
 if $0 == __FILE__
   client = XmppClient.new
-  client.create_user("a1@localhost", 'a1')
-  client.query_roster("a1@localhost", 'a1')
+  client.create_user("test@localhost", 'password')
+  client.query_roster("test@localhost", 'password')
 end
