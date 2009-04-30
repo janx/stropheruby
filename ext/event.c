@@ -226,6 +226,7 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 	if (!sock_is_recoverable(sock_error())) {
 	xmpp_error(ctx, "xmpp", "event watcher internal error %d", 
                    sock_error());
+  conn->error = sock_error();
 	return -1;
     }
     }
@@ -278,6 +279,7 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 			/* parse error, we need to shut down */
 			/* FIXME */
 			xmpp_debug(ctx, "xmpp", "parse error, disconnecting");
+                        conn -> error = -1;
 			conn_disconnect(conn);
 		    }
 		} else {

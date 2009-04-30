@@ -408,7 +408,7 @@ void conn_disconnect_clean(xmpp_conn_t * const conn)
 {
     /* remove the timed handler */
     xmpp_timed_handler_delete(conn, _disconnect_cleanup);
-
+    conn->error = -4;
     conn_disconnect(conn);
 }
 
@@ -440,7 +440,7 @@ static int _disconnect_cleanup(xmpp_conn_t * const conn,
 {
     xmpp_debug(conn->ctx, "xmpp",
 	       "disconnection forced by cleanup timeout");
-
+    conn->error = -5;
     conn_disconnect(conn);
 
     return 0;

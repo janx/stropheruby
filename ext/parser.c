@@ -64,6 +64,7 @@ void parser_handle_start(void *userdata,
 	if (strcmp(name, "stream:stream") != 0) {
 	    xmpp_error(conn->ctx, "xmpp",
 		       "Server did not open valid stream.");
+	    conn->error = -3;
 	    conn_disconnect(conn);
 	} else {
 	    _log_open_tag(conn, attr);
@@ -73,6 +74,7 @@ void parser_handle_start(void *userdata,
 	    if (!conn->stream_id) {
 		xmpp_error(conn->ctx, "xmpp",
 			   "Memory allocation failure.");
+		conn->error = -2;
 		conn_disconnect(conn);
 	    }
 
