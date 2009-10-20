@@ -427,11 +427,13 @@ void conn_disconnect(xmpp_conn_t * const conn)
 	tls_free(conn->tls);
 	conn->tls = NULL;
     }
-    sock_close(conn->sock);
 
+    sock_close(conn->sock);
     /* fire off connection handler */
-    conn->conn_handler(conn, XMPP_CONN_DISCONNECT, conn->error,
+    if (NULL != conn->conn_handler) {
+        conn->conn_handler(conn, XMPP_CONN_DISCONNECT, conn->error,
 		       conn->stream_error, conn->userdata);
+    }
 }
 
 /* timed handler for cleanup if normal disconnect procedure takes too long */
