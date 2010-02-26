@@ -18,11 +18,15 @@ This is a fork of flamontagne's stropheruby (http://github.com/flamontagne/strop
 
 == INSTALLATION
 
-sudo gem sources -a http://gems.github.com
-sudo gem install yong-stropheruby
+sudo gem sources -a http://gemcutter.org
+sudo gem install stropheruby
 
 For Rails app, add this line in your config/environment.rb:
-config.gem "yong-stropheruby", :source => "http://gems.github.com", :lib => "strophe_ruby"
+config.gem "stropheruby", :source => "http://gemcutter.org", :lib => "strophe_ruby"
+
+== NOTES
+
+Stropheruby v2.0 has upgraded the libstrophe to the upstream which is 20090526
 
 == EXAMPLE
 
