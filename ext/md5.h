@@ -6,7 +6,7 @@
 
 /** @file
  *  MD5 hash API.
-*/
+ */
 
 #ifndef MD5_H
 #define MD5_H

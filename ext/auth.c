@@ -1,7 +1,7 @@
 /* auth.c
 ** strophe XMPP client library -- auth functions and handlers
 **
-** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
+** Copyright (C) 2005-2009 Collecta, Inc. 
 **
 **  This software is provided AS-IS with no warranty, either express or
 **  implied.
@@ -208,9 +208,11 @@ static int _handle_features(xmpp_conn_t * const conn,
     xmpp_timed_handler_delete(conn, _handle_missing_features);
 
     /* check for TLS */
-    child = xmpp_stanza_get_child_by_name(stanza, "starttls");
-    if (child && (strcmp(xmpp_stanza_get_ns(child), XMPP_NS_TLS) == 0))
-	conn->tls_support = 1;
+    if (!conn->secured) {
+        child = xmpp_stanza_get_child_by_name(stanza, "starttls");
+        if (child && (strcmp(xmpp_stanza_get_ns(child), XMPP_NS_TLS) == 0))
+            conn->tls_support = 1;
+    }
 
     /* check for SASL */
     child = xmpp_stanza_get_child_by_name(stanza, "mechanisms");
@@ -234,13 +236,13 @@ static int _handle_features(xmpp_conn_t * const conn,
     if (conn->pass == NULL || conn->pass[0] == '\0') {
         xmpp_debug(conn->ctx, "auth", "do not attempt auth as there is no password given");
         //If no password, do not login, this will give 'register' a chance to run 
-      	conn->authenticated = 1;
-	      /* call connection handler */
-	      conn->conn_handler(conn, XMPP_CONN_CONNECT, 0, NULL, conn->userdata);
+       conn->authenticated = 1;
+             /* call connection handler */
+             conn->conn_handler(conn, XMPP_CONN_CONNECT, 0, NULL, conn->userdata);
     } else {
         _auth(conn);
     }
-
+ 
     return 0;
 }
 
@@ -265,7 +267,7 @@ static int _handle_proceedtls_default(xmpp_conn_t * const conn,
 {
     char *name;
     name = xmpp_stanza_get_name(stanza);
-    xmpp_debug(conn->ctx, "xmpp",
+    xmpp_debug(conn->ctx, "xmpp", 
 	"handle proceedtls called for %s", name);
 
     if (strcmp(name, "proceed") == 0) {
@@ -285,7 +287,8 @@ static int _handle_proceedtls_default(xmpp_conn_t * const conn,
 	}
 	else
 	{
-	    parser_prepare_reset(conn, _handle_open_tls);
+            conn->secured = 1;
+            conn_prepare_reset(conn, auth_handle_open);
 
 	    conn_open_stream(conn);
 	}
@@ -315,7 +318,7 @@ static int _handle_sasl_result(xmpp_conn_t * const conn,
 		   (char *)userdata);
 
 	/* reset parser */
-	parser_prepare_reset(conn, _handle_open_sasl);
+	conn_prepare_reset(conn, _handle_open_sasl);
 
 	/* send stream tag */
 	conn_open_stream(conn);
@@ -700,16 +703,6 @@ void auth_handle_open(xmpp_conn_t * const conn)
 		      FEATURES_TIMEOUT, NULL);
 }
 
-/* called when stream:stream tag received after TLS connection */
-static void _handle_open_tls(xmpp_conn_t * const conn)
-{
-    xmpp_debug(conn->ctx, "xmpp", "TLS successful, proceeding with SASL");
-
-    /* go straight to SASL auth */
-    _auth(conn);
-}
-
-
 /* called when stream:stream tag received after SASL auth */
 static void _handle_open_sasl(xmpp_conn_t * const conn)
 {
@@ -848,8 +841,16 @@ static int _handle_bind(xmpp_conn_t * const conn,
 	xmpp_error(conn->ctx, "xmpp", "Binding failed.");
 	xmpp_disconnect(conn);
     } else if (type && strcmp(type, "result") == 0) {
-	/* TODO: extract resource if present */
+        xmpp_stanza_t *binding = xmpp_stanza_get_child_by_name(stanza, "bind");
 	xmpp_debug(conn->ctx, "xmpp", "Bind successful.");
+
+        if (binding) {
+            xmpp_stanza_t *jid_stanza = xmpp_stanza_get_child_by_name(binding,
+                                                                      "jid");
+            if (jid_stanza) {
+                conn->bound_jid = xmpp_stanza_get_text(jid_stanza);
+            }
+        }
 
 	/* establish a session if required */
 	if (conn->session_required) {

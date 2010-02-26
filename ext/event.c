@@ -1,7 +1,7 @@
 /* event.c
 ** strophe XMPP client library -- event loop and management
 **
-** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
+** Copyright (C) 2005-2009 Collecta, Inc. 
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -31,7 +31,7 @@
  *  example, a GUI program will already include an event loop to
  *  process UI events from users, and xmpp_run_once() would be called
  *  from an idle function.
-*/
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,6 +49,7 @@
 
 #include "strophe.h"
 #include "common.h"
+#include "parser.h"
 
 #ifndef DEFAULT_TIMEOUT
 /** @def DEFAULT_TIMEOUT
@@ -83,6 +84,7 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
     int towrite;
     char buf[4096];
     uint64_t next;
+    long usec;
 
     if (ctx->loop_status == XMPP_LOOP_QUIT) return -2;
     ctx->loop_status = XMPP_LOOP_RUNNING;
@@ -128,16 +130,16 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 		}
 
 	    } else {
-	    ret = sock_write(conn->sock, &sq->data[sq->written], towrite);
+		ret = sock_write(conn->sock, &sq->data[sq->written], towrite);
 
-	    if (ret < 0 && !sock_is_recoverable(sock_error())) {
-		/* an error occured */
-		conn->error = sock_error();
-		break;
-	    } else if (ret < towrite) {
-		/* not all data could be sent now */
-	        if (ret >= 0) sq->written += ret;
-		break;
+		if (ret < 0 && !sock_is_recoverable(sock_error())) {
+		    /* an error occured */
+		    conn->error = sock_error();
+		    break;
+		} else if (ret < towrite) {
+		    /* not all data could be sent now */
+		    if (ret >= 0) sq->written += ret;
+		    break;
 		}
 	    }
 
@@ -168,7 +170,7 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
     /* reset parsers if needed */
     for (connitem = ctx->connlist; connitem; connitem = connitem->next) {
 	if (connitem->conn->reset_parser)
-	    parser_reset(connitem->conn);
+	    conn_parser_reset(connitem->conn);
     }
 
 
@@ -177,7 +179,7 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
        to be called */
     next = handler_fire_timed(ctx);
 
-    long usec = ((next < timeout) ? next : timeout) * 1000;
+    usec = ((next < timeout) ? next : timeout) * 1000;
     tv.tv_sec = usec / 1000000;
     tv.tv_usec = usec % 1000000;
 
@@ -223,20 +225,15 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 
     /* select errored */
     if (ret < 0) {
-	if (!sock_is_recoverable(sock_error())) {
-	xmpp_error(ctx, "xmpp", "event watcher internal error %d", 
-                   sock_error());
-  conn->error = sock_error();
+	if (!sock_is_recoverable(sock_error()))
+	    xmpp_error(ctx, "xmpp", "event watcher internal error %d", 
+		       sock_error());
 	return -1;
-    }
     }
     
     /* no events happened */
-    if (ret == 0) {
-	conn->error = ETIMEDOUT;
-	return 1;
-    }
-
+    if (ret == 0) return 1;
+    
     /* process events */
     connitem = ctx->connlist;
     while (connitem) {
@@ -248,8 +245,7 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 		/* connection complete */
 
 		/* check for error */
-		conn->error =  sock_connect_error(conn->sock); 
-		if (conn->error != 0) {
+		if (sock_connect_error(conn->sock) != 0) {
 		    /* connection failed */
 		    xmpp_debug(ctx, "xmpp", "connection failed");
 		    conn_disconnect(conn);
@@ -270,16 +266,15 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 		if (conn->tls) {
 		    ret = tls_read(conn->tls, buf, 4096);
 		} else {
-		ret = sock_read(conn->sock, buf, 4096);
+		    ret = sock_read(conn->sock, buf, 4096);
 		}
 
 		if (ret > 0) {
-		    ret = XML_Parse(conn->parser, buf, ret, 0);
+		    ret = parser_feed(conn->parser, buf, ret);
 		    if (!ret) {
 			/* parse error, we need to shut down */
 			/* FIXME */
 			xmpp_debug(ctx, "xmpp", "parse error, disconnecting");
-                        conn -> error = -1;
 			conn_disconnect(conn);
 		    }
 		} else {
@@ -291,12 +286,12 @@ int xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 			    conn_disconnect(conn);
 			}
 		    } else {
-		    /* return of 0 means socket closed by server */
-		    xmpp_debug(ctx, "xmpp", "Socket closed by remote host.");
-		    conn->error = ECONNRESET;
-		    conn_disconnect(conn);
+			/* return of 0 means socket closed by server */
+			xmpp_debug(ctx, "xmpp", "Socket closed by remote host.");
+			conn->error = ECONNRESET;
+			conn_disconnect(conn);
+		    }
 		}
-	    }
 	    }
 
 	    break;

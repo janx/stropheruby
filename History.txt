@@ -1,3 +1,6 @@
+== 0.2 2010-02-26
+  * update the libstrophe src
+
 == 0.1.4 2010-02-26
 
   * accessor of the connect_timeout in Connection class 

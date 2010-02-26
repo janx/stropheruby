@@ -1,7 +1,7 @@
 /* ctx.c
 ** strophe XMPP client library -- run-time context implementation
 **
-** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
+** Copyright (C) 2005-2009 Collecta, Inc. 
 **
 **  This software is provided AS-IS with no warranty, either express 
 **  or implied.
@@ -58,7 +58,7 @@
  *
  *  @ingroup Init
  */
-void xmpp_initialize(void)
+ void xmpp_initialize(void)
 {
     sock_initialize();
     tls_initialize();
@@ -248,12 +248,12 @@ void xmpp_log(const xmpp_ctx_t * const ctx,
 	      va_list ap)
 {
     int oldret, ret;
-    char smbuf[4096] = {0};
+    char smbuf[1024];
     char *buf;
 
     buf = smbuf;
-    ret = xmpp_vsnprintf(buf, 4096 - 1, fmt, ap);
-    if (ret > 4096 - 1) {
+    ret = xmpp_vsnprintf(buf, 1023, fmt, ap);
+    if (ret > 1023) {
 	buf = (char *)xmpp_alloc(ctx, ret + 1);
 	if (!buf) {
 	    buf = NULL;

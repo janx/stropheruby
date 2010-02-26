@@ -1,7 +1,7 @@
 /* stanza.c
 ** strophe XMPP client library -- XMPP stanza object and utilities
 **
-** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
+** Copyright (C) 2005-2009 Collecta, Inc. 
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -165,13 +165,13 @@ int xmpp_stanza_release(xmpp_stanza_t * const stanza)
     if (stanza->ref > 1)
 	stanza->ref--;
     else {
-    /* release all children */
-    child = stanza->children;
-    while (child) {
-	tchild = child;
-	child = child->next;
-	xmpp_stanza_release(tchild);
-    }
+	/* release all children */
+	child = stanza->children;
+	while (child) {
+	    tchild = child;
+	    child = child->next;
+	    xmpp_stanza_release(tchild);
+	}
 
 	if (stanza->attributes) hash_release(stanza->attributes);
 	if (stanza->data) xmpp_free(stanza->ctx, stanza->data);
@@ -398,45 +398,6 @@ char *xmpp_stanza_get_name(xmpp_stanza_t * const stanza)
 {
     if (stanza->type == XMPP_STANZA_TEXT) return NULL;
     return stanza->data;
-}
-
-/** Set or replace attributes on a stanza.
- *  This function replaces all previous attributes (if any) with the
- *  attributes given.  It is used primarily by the XML parser during
- *  stanza creation.  All strings in the array are copied before placing them
- *  inside the stanza object.
- *
- *  @param stanza a Strophe stanza object
- *  @param attr an array of strings with the attributes in the following
- *      format: attr[i] = attribute name, attr[i+1] = attribute value
- *
- *  @return XMPP_EOK on success, a number less than 0 on failure (XMPP_EMEM,
- *      XMPP_EINVOP)
- *
- *  @ingroup Stanza
- */
-int xmpp_stanza_set_attributes(xmpp_stanza_t * const stanza,
-			       const char * const * const attr)
-{
-    int i;
-    char *value;
-
-    if (stanza->attributes != NULL)
-	hash_release(stanza->attributes);
-
-    stanza->attributes = hash_new(stanza->ctx, 8, xmpp_free);
-    if (!stanza->attributes) return XMPP_EMEM;
-    
-    for (i = 0; attr[i]; i += 2) {
-	value = xmpp_strdup(stanza->ctx, attr[i + 1]);
-	if (!value) {
-	    /* FIXME: memory allocation error */
-	    continue;
-	}
-	hash_add(stanza->attributes, attr[i], value);
-    }
-    
-    return XMPP_EOK;
 }
 
 /** Count the attributes in a stanza object.

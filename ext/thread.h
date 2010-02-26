@@ -1,7 +1,7 @@
 /* thread.h
 ** strophe XMPP client library -- thread abstraction header
 **
-** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
+** Copyright (C) 2005-2009 Collecta, Inc. 
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -14,7 +14,7 @@
 
 /** @file
  *  Threading abstraction API.
-*/
+ */
 
 #ifndef __LIBSTROPHE_THREAD_H__
 #define __LIBSTROPHE_THREAD_H__

@@ -4,6 +4,7 @@ Stropheruby is a ruby bindings for Strophe, a C library for writing XMPP clients
 
 This is a fork of flamontagne's stropheruby (http://github.com/flamontagne/stropheruby/tree/master) with the following improvements:
 
+* accessor of the connect_timeout in the Connection class
 * A patched version of libstrophe (trunk) is included. So there is no extra library to install. 
 * (libstrophe) Fixed a timeout issue on Mac OSX: http://groups.google.com/group/strophe-dev/browse_thread/thread/ef4cb19785020fb6
 * (libstrophe) Fixed basic auth: http://groups.google.com/group/strophe-dev/browse_thread/thread/b770f72c83d1a0b9

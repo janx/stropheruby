@@ -1,7 +1,7 @@
 /* strophe.h
 ** strophe XMPP client library C API
 **
-** Copyright (C) 2005-2008 OGG, LLC.
+** Copyright (C) 2005-2009 Collecta, Inc.
 **
 **  This software is provided AS-IS with no warranty, either express or
 **  implied.
@@ -14,7 +14,7 @@
 
 /** @file
  *  Strophe public C API definitions.
-*/
+ */
 
 #ifndef __LIBSTROPHE_STROPHE_H__
 #define __LIBSTROPHE_STROPHE_H__
@@ -212,16 +212,19 @@ xmpp_conn_t * xmpp_conn_clone(xmpp_conn_t * const conn);
 int xmpp_conn_release(xmpp_conn_t * const conn);
 
 const char *xmpp_conn_get_jid(const xmpp_conn_t * const conn);
+const char *xmpp_conn_get_bound_jid(const xmpp_conn_t * const conn);
 void xmpp_conn_set_jid(xmpp_conn_t * const conn, const char * const jid);
 const char *xmpp_conn_get_pass(const xmpp_conn_t * const conn);
 void xmpp_conn_set_pass(xmpp_conn_t * const conn, const char * const pass);
+unsigned int xmpp_conn_get_connect_timeout(const xmpp_conn_t * const conn);
+void xmpp_conn_set_connect_timeout(xmpp_conn_t * const conn, const unsigned int timeout);     
 xmpp_ctx_t* xmpp_conn_get_context(xmpp_conn_t * const conn);
 
-int xmpp_connect_client(xmpp_conn_t * const conn,
+int xmpp_connect_client(xmpp_conn_t * const conn, 
 			  const char * const altdomain,
 			  unsigned short altport,
-			xmpp_conn_handler callback,
-			void * const userdata);
+			  xmpp_conn_handler callback,
+			  void * const userdata);
 
 /*
 int xmpp_connect_component(conn, name)

@@ -1,7 +1,7 @@
 /* handler.c
 ** strophe XMPP client library -- event handler management
 **
-** Copyright (C) 2005-2008 OGG, LLC. All rights reserved.
+** Copyright (C) 2005-2009 Collecta, Inc. 
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -66,6 +66,7 @@ void handler_fire_stanza(xmpp_conn_t * const conn,
 		    hash_drop(conn->id_handlers, id);
 		    hash_add(conn->id_handlers, id, next);
 		}
+                xmpp_free(conn->ctx, item->id);
 		xmpp_free(conn->ctx, item);
 		item = NULL;
 	    }
@@ -89,7 +90,7 @@ void handler_fire_stanza(xmpp_conn_t * const conn,
     while (item) {
 	/* skip newly added handlers */
 	if (!item->enabled) {
-        prev = item;
+	    prev = item;
 	    item = item->next;
 	    continue;
 	}
@@ -111,6 +112,9 @@ void handler_fire_stanza(xmpp_conn_t * const conn,
 		    prev->next = item->next;
 		else
 		    conn->handlers = item->next;
+                if (item->ns) xmpp_free(conn->ctx, item->ns);
+                if (item->name) xmpp_free(conn->ctx, item->name);
+                if (item->type) xmpp_free(conn->ctx, item->type);
 		xmpp_free(conn->ctx, item);
 		item = NULL;
 	    }
