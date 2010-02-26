@@ -332,6 +332,24 @@ xmpp_ctx_t* xmpp_conn_get_context(xmpp_conn_t * const conn)
 	return conn->ctx;
 }
 
+/** Get the connect timeout bounded to the connection.
+ *
+ * @ingroup Connections
+ */
+unsigned int xmpp_conn_get_connect_timeout(const xmpp_conn_t * const conn)
+{
+     return conn->connect_timeout;
+}
+
+/** Set the connection's connect timeout
+ *
+ * @ingroup Connections
+ */
+void xmpp_conn_set_connect_timeout(xmpp_conn_t * const conn, const unsigned int timeout)
+{
+     conn->connect_timeout = timeout;
+}
+
 /** Initiate a connection to the XMPP server.
  *  This function returns immediately after starting the connection
  *  process to the XMPP server, and notifiations of connection state changes

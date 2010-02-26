@@ -181,6 +181,22 @@ static VALUE t_xmpp_conn_set_pass(VALUE self, VALUE pass) {
     return pass;
 }
 
+/* get the connect_timeout */
+static VALUE t_xmpp_conn_get_connect_timeout(VALUE self) 
+{
+     xmpp_conn_t *conn;
+     Data_Get_Struct(self, xmpp_conn_t, conn);
+     return INT2FIX(xmpp_conn_get_connect_timeout(conn));
+}
+
+/* set the connect_timeout */
+static VALUE t_xmpp_conn_set_connect_timeout(VALUE self, VALUE timeout)
+{
+     xmpp_conn_t *conn;
+     Data_Get_Struct(self, xmpp_conn_t, conn);
+     xmpp_conn_set_connect_timeout(conn, FIX2INT(timeout));
+     return timeout;
+}
     
 /* Parent handler for the connection... we call yield to invoke the client callback*/
 static void _conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status, 
@@ -680,6 +696,8 @@ void Init_strophe_ruby() {
     rb_define_method(cConnection, "jid=", t_xmpp_conn_set_jid,1);
     rb_define_method(cConnection, "password", t_xmpp_conn_get_pass,0);
     rb_define_method(cConnection, "password=", t_xmpp_conn_set_pass,1);
+    rb_define_method(cConnection, "connect_timeout", t_xmpp_conn_get_connect_timeout,0);
+    rb_define_method(cConnection, "connect_timeout=", t_xmpp_conn_set_connect_timeout,1);    
     rb_define_method(cConnection, "connect", t_xmpp_connect_client,0);
     rb_define_method(cConnection, "disconnect", t_xmpp_disconnect, 0);
     rb_define_method(cConnection, "send", t_xmpp_send, 1);
