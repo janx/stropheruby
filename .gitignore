@@ -1,2 +1,6 @@
 TAGS
 *.gem
+*.o
+ext/Makefile
+ext/conftest.dSYM/
+ext/strophe_ruby.bundle
