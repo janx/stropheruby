@@ -1,3 +1,7 @@
+== 0.2.2 2011-06-09
+
+  * STR2CSTR is deprecated and use StringValuePtr instead
+  
 == 0.2.1 2010-09-19
 
   * Scope md5 function to avoid name clashing

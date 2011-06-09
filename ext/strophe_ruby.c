@@ -162,7 +162,7 @@ static VALUE t_xmpp_conn_get_jid(VALUE self) {
 static VALUE t_xmpp_conn_set_jid(VALUE self, VALUE jid) {
     xmpp_conn_t *conn;
     Data_Get_Struct(self, xmpp_conn_t, conn);
-    xmpp_conn_set_jid(conn, STR2CSTR(jid));
+    xmpp_conn_set_jid(conn, StringValuePtr(jid));
     return jid;
 }
 
@@ -177,7 +177,7 @@ static VALUE t_xmpp_conn_get_pass(VALUE self) {
 static VALUE t_xmpp_conn_set_pass(VALUE self, VALUE pass) {
     xmpp_conn_t *conn;
     Data_Get_Struct(self, xmpp_conn_t, conn);
-    xmpp_conn_set_pass(conn, STR2CSTR(pass));
+    xmpp_conn_set_pass(conn, StringValuePtr(pass));
     return pass;
 }
 
@@ -301,7 +301,7 @@ int _id_handler(xmpp_conn_t * const conn,
 static VALUE t_xmpp_handler_add(VALUE self,VALUE rb_name) {    
     xmpp_conn_t *conn;
     Data_Get_Struct(self, xmpp_conn_t, conn);    
-    char *name = STR2CSTR(rb_name);
+    char *name = StringValuePtr(rb_name);
     VALUE arr;
     xmpp_handler handler;
     
@@ -327,12 +327,12 @@ static VALUE t_xmpp_handler_add(VALUE self,VALUE rb_name) {
 static VALUE t_xmpp_id_handler_add(VALUE self, VALUE rb_id) {
     xmpp_conn_t *conn;
     Data_Get_Struct(self, xmpp_conn_t, conn);    
-    char *id = STR2CSTR(rb_id);
+    char *id = StringValuePtr(rb_id);
     VALUE arr;
     
     arr = rb_iv_get(self, "@id_handlers");
     rb_ary_push(arr, rb_block_proc());
-    xmpp_id_handler_add(conn, _id_handler, STR2CSTR(id), conn->ctx);
+    xmpp_id_handler_add(conn, _id_handler, StringValuePtr(id), conn->ctx);
     return Qnil;
 }
 
@@ -381,7 +381,7 @@ static VALUE t_xmpp_send_raw_string(VALUE self, VALUE rb_text) {
     char *text;
     
     Data_Get_Struct(self, xmpp_conn_t, conn);
-    text = STR2CSTR(rb_text);
+    text = StringValuePtr(rb_text);
     
     xmpp_send_raw_string(conn, "%s", text);
     return Qtrue;
@@ -441,7 +441,7 @@ static VALUE t_xmpp_stanza_get_child_by_name(VALUE self, VALUE rb_name) {
     xmpp_stanza_t *child;
     Data_Get_Struct(self, xmpp_stanza_t, stanza);
     
-    char *name = STR2CSTR(rb_name);
+    char *name = StringValuePtr(rb_name);
     child = xmpp_stanza_get_child_by_name(stanza, name);
         
     if(child) {   
@@ -469,7 +469,7 @@ static VALUE t_xmpp_stanza_get_attribute(VALUE self, VALUE rb_attribute) {
     xmpp_stanza_t *stanza;    
     Data_Get_Struct(self, xmpp_stanza_t, stanza);
         
-    char *val = xmpp_stanza_get_attribute(stanza,STR2CSTR(rb_attribute));
+    char *val = xmpp_stanza_get_attribute(stanza,StringValuePtr(rb_attribute));
     return rb_str_new2(val);
 }
 
@@ -531,8 +531,8 @@ static VALUE t_xmpp_stanza_set_attribute(VALUE self, VALUE rb_attribute, VALUE r
     xmpp_stanza_t *stanza;    
     Data_Get_Struct(self, xmpp_stanza_t, stanza);
     
-    char *attribute = STR2CSTR(rb_attribute);
-    char *val = STR2CSTR(rb_val);
+    char *attribute = StringValuePtr(rb_attribute);
+    char *val = StringValuePtr(rb_val);
     
     xmpp_stanza_set_attribute(stanza, attribute, val);
     return Qtrue;
@@ -543,7 +543,7 @@ static VALUE t_xmpp_stanza_set_ns(VALUE self, VALUE rb_ns) {
     xmpp_stanza_t *stanza;    
     Data_Get_Struct(self, xmpp_stanza_t, stanza);
     
-    char *ns = STR2CSTR(rb_ns);
+    char *ns = StringValuePtr(rb_ns);
     
     xmpp_stanza_set_ns(stanza, ns);
     return Qtrue;
@@ -568,7 +568,7 @@ static VALUE t_xmpp_stanza_set_text(VALUE self, VALUE rb_text) {
     xmpp_stanza_t *stanza;    
     Data_Get_Struct(self, xmpp_stanza_t, stanza);
     
-    char *text = STR2CSTR(rb_text);
+    char *text = StringValuePtr(rb_text);
     
     xmpp_stanza_set_text(stanza, text);
     return rb_text;    
@@ -579,7 +579,7 @@ static VALUE t_xmpp_stanza_set_name(VALUE self, VALUE rb_name) {
     xmpp_stanza_t *stanza;    
     Data_Get_Struct(self, xmpp_stanza_t, stanza);
     
-    char *name = STR2CSTR(rb_name);
+    char *name = StringValuePtr(rb_name);
     
     xmpp_stanza_set_name(stanza, name);
     return Qtrue;
@@ -590,7 +590,7 @@ static VALUE t_xmpp_stanza_set_type(VALUE self, VALUE rb_type) {
     xmpp_stanza_t *stanza;    
     Data_Get_Struct(self, xmpp_stanza_t, stanza);
     
-    char *type = STR2CSTR(rb_type);
+    char *type = StringValuePtr(rb_type);
     
     xmpp_stanza_set_type(stanza, type);
     return Qtrue;
@@ -601,7 +601,7 @@ static VALUE t_xmpp_stanza_set_id(VALUE self, VALUE rb_id) {
     xmpp_stanza_t *stanza;    
     Data_Get_Struct(self, xmpp_stanza_t, stanza);
     
-    char *id = STR2CSTR(rb_id);
+    char *id = StringValuePtr(rb_id);
     
     xmpp_stanza_set_id(stanza, id);
     return Qtrue;
